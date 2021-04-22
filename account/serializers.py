@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from account.utils import send_activation_mail
-# from myprofile.models import ProfileDesigner, ProfileCustomer
+from myprofile.models import ProfileMaster, ProfileCustomer
 
 MyUser = get_user_model()
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(min_length=8, write_only=True, required=True)

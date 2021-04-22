@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import ProfileMaster, ProfileCustomer
 
-# Register your models here.
+admin.site.register(ProfileMaster)
+admin.site.register(ProfileCustomer)
