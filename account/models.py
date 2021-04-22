@@ -35,6 +35,7 @@ STATUS_CHOICES = (
     ('customer', 'customer'),
 )
 
+
 class MyUser(AbstractUser):
     email = models.EmailField(max_length=150, unique=True)
     username = models.CharField(max_length=155, unique=True)
@@ -51,5 +52,5 @@ class MyUser(AbstractUser):
         return f'{self.email}'
 
     def create_activation_code(self):
-        code = get_random_string(length=6, allowed_chars='1234567890')
+        code = get_random_string(length=6, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
         self.activation_code = code
