@@ -93,6 +93,18 @@ class PostViewSet(PermissionMixinPost, viewsets.ModelViewSet):
         serializer = PostSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(methods=['GET'], detail=False)
+    def sort(self, request):
+        filter = request.query_params.get('filter')
+        if filter == 'A-Z':
+            queryset = self.get_queryset().order_by('location')
+        elif filter == 'Z-A':
+            queryset = self.get_queryset().order_by('-location')
+        else:
+            queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ReviewViewSet(PermissionMixinReview, viewsets.ModelViewSet):
     queryset = Review.objects.all()

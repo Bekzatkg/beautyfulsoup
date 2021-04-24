@@ -20,7 +20,7 @@ class ProfileMaster(models.Model):
         return f'{self.user.email}'
 
     def save(self, *args, **kwargs):
-        to_slug = str(self.user.username).lower()
+        to_slug = str(self.user.email)
         self.slug = to_slug
         super().save(*args, **kwargs)
 
@@ -38,6 +38,6 @@ class ProfileCustomer(models.Model):
         return self.email
 
     def save(self, *args, **kwargs):
-        to_slug = str(self.user.username).lower()
+        to_slug = str(self.user.email)
         self.slug = to_slug
         super().save(*args, **kwargs)

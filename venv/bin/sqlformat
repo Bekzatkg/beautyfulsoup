@@ -1,4 +1,4 @@
-#!/home/elizar/Desktop/makers/Beatyfulsoup/venv/bin/python
+#!/home/elizar/Desktop/makers/Beatyfulsoup/venv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

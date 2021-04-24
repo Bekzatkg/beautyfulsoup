@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from account.utils import send_activation_mail
 from myprofile.models import ProfileMaster, ProfileCustomer
@@ -12,17 +12,12 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MyUser
-        fields = ('email', 'username', 'password', 'password_confirm', 'status')
+        fields = ('email', 'password', 'password_confirm', 'status')
 
     def validate_email(self, email):
         if MyUser.objects.filter(email=email).exists():
             raise serializers.ValidationError('Пользователь с данным email уже существует')
         return email
-
-    def validate_username(self, username):
-        if MyUser.objects.filter(username=username).exists():
-            raise serializers.ValidationError('Пользователь с данным именем уже существует')
-        return username
 
     def validate(self, attrs):
         password = attrs.get('password')
@@ -33,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = MyUser.objects.create_user(**validated_data)
-        send_activation_mail.delay(user.email, user.activation_code)
+        send_activation_mail(user.email, user.activation_code)
         if user.status == 'master':
             ProfileMaster.objects.create(user=user, email=user.email)
         else:
@@ -78,3 +73,29 @@ class CreateNewPasswordSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
         return user
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(
+        label="Password",
+        style={'input_type': 'password'},
+        trim_whitespace=False
+    )
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = authenticate(request=self.context.get('request'),
+                                email=email, password=password)
+            if not user:
+                msg = 'Unable to log in with provided credentials.'
+                raise serializers.ValidationError(msg, code='authorization')
+        else:
+            msg = 'Must include "email" and "password".'
+            raise serializers.ValidationError(msg, code='authorization')
+
+        attrs['user'] = user
+        return attrs
